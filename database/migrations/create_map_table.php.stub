@@ -1,0 +1,105 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up()
+    {
+        Schema::create('maps_maps', function (Blueprint $table) {
+            $table->id();
+            $table->string('title')->nullable();
+            $table->text('abstract')->nullable();
+            $table->float('center_x')->nullable();
+            $table->float('center_y')->nullable();
+            $table->float('zoom')->nullable();
+            $table->string('projection', 32)->nullable();
+            $table->json('baselayers', 32)->nullable();
+            $table->integer('baselayer_selected')->nullable();
+            $table->integer('baselayer_menu_id')->nullable();
+            $table->integer('layer_menu_id')->nullable();
+            $table->string('search_provider', 32)->nullable();
+            $table->string('search_apis', 32)->nullable();
+            $table->timestamp('published_at')->nullable();
+            $table->timestamps();
+        });
+
+
+        Schema::create('maps_layers', function (Blueprint $table) {
+            $table->id();
+            $table->integer('service_id')->nullable();
+            $table->string('type')->nullable();
+            $table->string('title')->nullable();
+            $table->string('name')->nullable();
+            $table->float('opacity')->nullable();
+            $table->json('styles')->nullable();
+            $table->string('format')->nullable();
+            $table->boolean('transparent')->nullable();
+            $table->string('group')->nullable();
+            $table->boolean('visibility')->nullable();
+            $table->text('url')->nullable();
+            $table->json('popup')->nullable();
+            $table->json('layer_params')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('maps_services', function (Blueprint $table) {
+            $table->id();
+            $table->string('type', 10)->nullable();
+            $table->string('base_url')->nullable();
+            $table->string('version', 10)->nullable();
+            $table->string('name')->nullable();
+            $table->text('description')->nullable();
+            $table->text('online_resource')->nullable();
+            $table->integer('parent_id')->nullable();
+            $table->string('proxy_base')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('maps_apis', function (Blueprint $table) {
+            $table->id();
+
+            $table->string('title')->nullable();
+            $table->text('description')->nullable();
+            $table->string('name')->nullable();
+            $table->string('model_type')->nullable();
+            $table->string('connection')->nullable();
+            $table->string('table')->nullable();
+            $table->string('uri_key')->nullable();
+            $table->text('title_template', 10)->nullable();
+            $table->text('body_template', 10)->nullable();
+            $table->json('display_fields')->nullable();
+            $table->json('search_fields')->nullable();
+            $table->json('fillable_fields')->nullable();
+            $table->boolean('scout')->nullable();
+            $table->string('status', 20)->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('maps_bookmarks', function (Blueprint $table) {
+            $table->id();
+            $table->string('title')->nullable();
+            $table->text('description')->nullable();
+            $table->string('icon')->nullable();
+            $table->json('bounds')->nullable();
+            $table->json('geometry')->nullable();
+            $table->timestamps();
+        });
+    }
+
+      /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('maps_maps');
+        Schema::dropIfExists('maps_layers');
+        Schema::dropIfExists('maps_services');
+        Schema::dropIfExists('maps_apis');
+        Schema::dropIfExists('maps_bookmarks');
+    }
+};

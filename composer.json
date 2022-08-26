@@ -1,0 +1,65 @@
+{
+    "name": "ttungbmt/laravel-map",
+    "description": "This is my package laravel-map",
+    "keywords": [
+        "ttungbmt",
+        "laravel",
+        "laravel-map"
+    ],
+    "homepage": "https://github.com/ttungbmt/laravel-map",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Truong Thanh Tung",
+            "email": "ttungbmt@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "spatie/laravel-package-tools": "^1.9.2",
+        "illuminate/contracts": "^9.0",
+        "mstaack/laravel-postgis": "^5.4"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.0",
+        "nunomaduro/collision": "^6.0",
+        "orchestra/testbench": "^7.0",
+        "pestphp/pest": "^1.21",
+        "pestphp/pest-plugin-laravel": "^1.1",
+        "phpunit/phpunit": "^9.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "TungTT\\LaravelMap\\": "src",
+            "TungTT\\LaravelMap\\Database\\Factories\\": "database/factories",
+            "TungTT\\LaravelMap\\Database\\Seeders\\": "database/seeders"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TungTT\\LaravelMap\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TungTT\\LaravelMap\\LaravelMapServiceProvider"
+            ],
+            "aliases": {
+                "LaravelMap": "TungTT\\LaravelMap\\Facades\\LaravelMap"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
