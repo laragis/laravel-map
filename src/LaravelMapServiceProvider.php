@@ -30,17 +30,21 @@ class LaravelMapServiceProvider extends PackageServiceProvider
 
     public function packageBooted()
     {
-
         // Register Policies for APIs
-        foreach (app(Filesystem::class)->files(app_path('Models/Api')) as $file){
-            $name = pathinfo($file->getBasename(), PATHINFO_FILENAME);
-            $model = "App\\Models\\Api\\{$name}";
-            $policy = "App\\Policies\\Api\\{$name}Policy";
+        $fileManager = app(Filesystem::class);
 
-            if($this->exists($model) && $this->exists($policy)){
-                Gate::policy($model, $policy);
+        if($fileManager->exists(app_path('Models/Api'))){
+            foreach (app(Filesystem::class)->files(app_path('Models/Api')) as $file){
+                $name = pathinfo($file->getBasename(), PATHINFO_FILENAME);
+                $model = "App\\Models\\Api\\{$name}";
+                $policy = "App\\Policies\\Api\\{$name}Policy";
+
+                if($this->exists($model) && $this->exists($policy)){
+                    Gate::policy($model, $policy);
+                }
             }
         }
+
     }
 
     protected function exists($rawName)
