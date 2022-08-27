@@ -2,6 +2,7 @@
 
 namespace TungTT\LaravelMap;
 
+use Binaryk\LaravelRestify\Restify;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
@@ -10,6 +11,9 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 use TungTT\LaravelMap\Commands\ApiDeleteCommand;
 use TungTT\LaravelMap\Commands\ApiMakeCommand;
 use TungTT\LaravelMap\Commands\LaravelMapCommand;
+use TungTT\LaravelMap\Models\MapBookmark;
+use TungTT\LaravelMap\Policies\MapPolicy;
+use TungTT\LaravelMap\Restify\MapBookmarkRepository;
 
 class LaravelMapServiceProvider extends PackageServiceProvider
 {
@@ -30,6 +34,25 @@ class LaravelMapServiceProvider extends PackageServiceProvider
 
     public function packageBooted()
     {
+        $this->registerRepositories();
+        $this->registerPolicies();
+    }
+
+    protected function registerRepositories(){
+        Restify::repositories([
+            MapBookmarkRepository::class
+        ]);
+    }
+
+    protected function registerPolicies(){
+        $policies = [
+            MapBookmark::class => MapPolicy::class,
+        ];
+
+        foreach ($policies as $model => $policy){
+            Gate::policy($model, $policy);
+        }
+
         // Register Policies for APIs
         $fileManager = app(Filesystem::class);
 
@@ -44,7 +67,6 @@ class LaravelMapServiceProvider extends PackageServiceProvider
                 }
             }
         }
-
     }
 
     protected function exists($rawName)
