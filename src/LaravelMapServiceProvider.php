@@ -2,6 +2,7 @@
 
 namespace TungTT\LaravelMap;
 
+use Binaryk\LaravelRestify\Restify;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
@@ -10,6 +11,9 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 use TungTT\LaravelMap\Commands\ApiDeleteCommand;
 use TungTT\LaravelMap\Commands\ApiMakeCommand;
 use TungTT\LaravelMap\Commands\LaravelMapCommand;
+use TungTT\LaravelMap\Models\MapBookmark;
+use TungTT\LaravelMap\Policies\MapPolicy;
+use TungTT\LaravelMap\Restify\MapBookmarkRepository;
 
 class LaravelMapServiceProvider extends PackageServiceProvider
 {
@@ -30,15 +34,37 @@ class LaravelMapServiceProvider extends PackageServiceProvider
 
     public function packageBooted()
     {
+        $this->registerRepositories();
+        $this->registerPolicies();
+    }
+
+    protected function registerRepositories(){
+        Restify::repositories([
+            MapBookmarkRepository::class
+        ]);
+    }
+
+    protected function registerPolicies(){
+        $policies = [
+            MapBookmark::class => MapPolicy::class,
+        ];
+
+        foreach ($policies as $model => $policy){
+            Gate::policy($model, $policy);
+        }
 
         // Register Policies for APIs
-        foreach (app(Filesystem::class)->files(app_path('Models/Api')) as $file){
-            $name = pathinfo($file->getBasename(), PATHINFO_FILENAME);
-            $model = "App\\Models\\Api\\{$name}";
-            $policy = "App\\Policies\\Api\\{$name}Policy";
+        $fileManager = app(Filesystem::class);
 
-            if($this->exists($model) && $this->exists($policy)){
-                Gate::policy($model, $policy);
+        if($fileManager->exists(app_path('Models/Api'))){
+            foreach (app(Filesystem::class)->files(app_path('Models/Api')) as $file){
+                $name = pathinfo($file->getBasename(), PATHINFO_FILENAME);
+                $model = "App\\Models\\Api\\{$name}";
+                $policy = "App\\Policies\\Api\\{$name}Policy";
+
+                if($this->exists($model) && $this->exists($policy)){
+                    Gate::policy($model, $policy);
+                }
             }
         }
     }
