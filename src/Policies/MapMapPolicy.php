@@ -3,9 +3,9 @@ namespace TungTT\LaravelMap\Policies;
 
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use TungTT\LaravelMap\Models\MapBookmark;
+use TungTT\LaravelMap\Models\MapMap;
 
-class MapPolicy
+class MapMapPolicy
 {
     use HandlesAuthorization;
 
@@ -14,7 +14,7 @@ class MapPolicy
         return true;
     }
 
-    public function show(User $user = null, MapBookmark $model): bool
+    public function show(User $user = null, MapMap $model): bool
     {
         return true;
     }
@@ -29,22 +29,22 @@ class MapPolicy
         return true;
     }
 
-    public function update(User $user = null, MapBookmark $model): bool
+    public function update(User $user = null, MapMap $model): bool
     {
         return true;
     }
 
-    public function updateBulk(User $user, MapBookmark $model): bool
+    public function updateBulk(User $user, MapMap $model): bool
     {
         return true;
     }
 
-    public function deleteBulk(User $user, MapBookmark $model): bool
+    public function deleteBulk(User $user, MapMap $model): bool
     {
         return true;
     }
 
-    public function delete(User $user, MapBookmark $model): bool
+    public function delete(User $user, MapMap $model): bool
     {
         return true;
     }

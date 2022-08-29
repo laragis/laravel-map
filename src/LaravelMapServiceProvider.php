@@ -10,10 +10,13 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use TungTT\LaravelMap\Commands\ApiDeleteCommand;
 use TungTT\LaravelMap\Commands\ApiMakeCommand;
-use TungTT\LaravelMap\Commands\LaravelMapCommand;
+//use TungTT\LaravelMap\Commands\LaravelMapCommand;
 use TungTT\LaravelMap\Models\MapBookmark;
-use TungTT\LaravelMap\Policies\MapPolicy;
+use TungTT\LaravelMap\Models\MapMap;
+use TungTT\LaravelMap\Policies\MapBookmarkPolicy;
+use TungTT\LaravelMap\Policies\MapMapPolicy;
 use TungTT\LaravelMap\Restify\MapBookmarkRepository;
+use TungTT\LaravelMap\Restify\MapMapRepository;
 
 class LaravelMapServiceProvider extends PackageServiceProvider
 {
@@ -40,13 +43,15 @@ class LaravelMapServiceProvider extends PackageServiceProvider
 
     protected function registerRepositories(){
         Restify::repositories([
-            MapBookmarkRepository::class
+            MapMapRepository::class,
+            MapBookmarkRepository::class,
         ]);
     }
 
     protected function registerPolicies(){
         $policies = [
-            MapBookmark::class => MapPolicy::class,
+            MapBookmark::class => MapBookmarkPolicy::class,
+            MapMap::class => MapMapPolicy::class,
         ];
 
         foreach ($policies as $model => $policy){
