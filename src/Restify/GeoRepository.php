@@ -28,7 +28,7 @@ class GeoRepository extends Repository
     public static function searchables(): array
     {
         if(!empty(static::$search)) return static::$search;
-        
+
         if(!empty(static::$model::$search)) return static::$model::$search;
 
         return [static::newModel()->getKeyName()];
