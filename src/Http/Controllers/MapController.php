@@ -121,6 +121,11 @@ class MapController extends Controller
                     $data = array_merge($data , $this->formatLayerItem($layer), ['icon' => false], $i['data']);
                 }
 
+                $api = MapApi::whereJsonContains('layers_id', $i['value'])->first();
+                if($api && $api->status){
+                    $data['api_url'] = '/api/restify/'.$api->name;
+                }
+
                 if ($i['children']->isNotEmpty()) {
                     $data['folder'] = true;
                     $data['children'] = $fn($i['children'], $fn)->all();
