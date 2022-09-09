@@ -3,6 +3,9 @@ namespace TungTT\LaravelMap\Restify;
 
 use App\Restify\Repository;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Support\Facades\DB;
+use MStaack\LaravelPostgis\Geometries\GeometryCollection;
+use MStaack\LaravelPostgis\Geometries\MultiPolygon;
 use TungTT\LaravelMap\Restify\Filters\IntersectsFilter;
 
 class GeoRepository extends Repository
@@ -13,11 +16,15 @@ class GeoRepository extends Repository
         $display = collect($model::$display);
         $primaryKey = $model->getKeyName();
 
+
         return [
             $primaryKey === 'id' ? id() : field($primaryKey)->label('id')->readonly(),
             ...collect($display)->map(function ($name) use($model, $primaryKey) {
                 if(property_exists($model, 'postgisFields') && in_array($name, $model->getPostgisFields())){
-                    return field('geometry', fn() => $this->{$name});
+                    return field('geometry', fn() => $this->{$name})->fillCallback(function (RestifyRequest $request, $model, $attribute) use($name) {
+                        $geojson = json_encode($request->input('geometry'));
+                        $model->{$name} = DB::raw("ST_GeomFromGeoJSON('{$geojson}')");
+                    });
                 }
 
                 return field($name);
