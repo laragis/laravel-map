@@ -115,6 +115,10 @@ class MapApi extends Resource
             MultiSelect::make(__('Display Fields'), 'display_fields')->hide()->dependsOn(['table', 'connection'], $getFields)->displayUsingLabels()->nullable()->hideFromIndex(),
             MultiSelect::make(__('Fillable Fields'), 'fillable_fields')->hide()->dependsOn(['table', 'connection'], $getFields)->displayUsingLabels()->nullable()->hideFromIndex(),
 
+            MultiSelect::make(__('Layers'), 'layers_id')->options(function (){
+                return \TungTT\LaravelMap\Models\MapLayer::where('group', 'layer')->pluck('title', 'id');
+            })->displayUsingLabels()->nullable()->hideFromIndex(),
+
             Hidden::make('model_type')->fillUsing(function ($request, $model, $attribute, $requestAttribute){
                 $modelClass = (string)Str::of($model->name)->slug('_')->camel()->ucfirst();
                 $model->{$attribute} = 'App\Models\Api\\'.$modelClass;
