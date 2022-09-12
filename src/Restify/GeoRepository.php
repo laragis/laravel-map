@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use MStaack\LaravelPostgis\Geometries\GeometryCollection;
 use MStaack\LaravelPostgis\Geometries\MultiPolygon;
 use TungTT\LaravelMap\Restify\Filters\IntersectsFilter;
+use TungTT\LaravelMap\Restify\Getters\AttributesGetter;
 
 class GeoRepository extends Repository
 {
@@ -23,7 +24,14 @@ class GeoRepository extends Repository
                 if(property_exists($model, 'postgisFields') && in_array($name, $model->getPostgisFields())){
                     return field('geometry', fn() => $this->{$name})->fillCallback(function (RestifyRequest $request, $model, $attribute) use($name) {
                         $geojson = json_encode($request->input('geometry'));
-                        $model->{$name} = DB::raw("ST_GeomFromGeoJSON('{$geojson}')");
+
+                        $statement = "ST_GeomFromGeoJSON('{$geojson}')";
+
+                        if(json_decode($geojson, true)['type'] === 'Polygon'){
+                            $statement = "ST_Multi(ST_GeomFromGeoJSON('{$geojson}'))";
+                        }
+
+                        $model->{$name} = DB::raw($statement);
                     });
                 }
 
@@ -50,6 +58,13 @@ class GeoRepository extends Repository
     {
         return [
             IntersectsFilter::new(),
+        ];
+    }
+
+    public function getters(RestifyRequest $request): array
+    {
+        return [
+            AttributesGetter::new($this->getType($request))->onlyOnIndex()
         ];
     }
 }

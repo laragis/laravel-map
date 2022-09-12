@@ -9,4 +9,8 @@ class Attribute extends Model
     protected $connection = 'geonode';
 
     protected $table = 'layers_attribute';
+
+    public function layer(){
+        return $this->belongsTo(Layer::class, 'layer_id', 'resourcebase_ptr_id');
+    }
 }

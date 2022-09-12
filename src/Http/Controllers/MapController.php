@@ -127,7 +127,13 @@ class MapController extends Controller
 
                 $api = MapApi::whereJsonContains('layers_id', $i['value'])->first();
                 if($api && $api->status){
-                    $data['api_url'] = '/api/restify/'.$api->name;
+                    $data['api'] = [
+                        'name' => $api->name,
+                        'url' => '/api/restify/'.$api->name,
+                        'getters' => [
+                            'attributes' => '/api/restify/'.$api->name.'/getters/attributes'
+                        ]
+                    ];
                 }
 
                 if ($i['children']->isNotEmpty()) {
