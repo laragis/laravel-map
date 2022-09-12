@@ -169,7 +169,6 @@ class MapController extends Controller
             $layers = data_get($layer, 'layer_params.params.layers');
             if(!in_array($layers, $this->resources)) {
                 $data['locked'] = true;
-//                if($data['selected'])
             }
         }
 
