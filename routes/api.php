@@ -7,11 +7,16 @@
 //   ])->values();
 //});
 
+use Illuminate\Support\Facades\Route;
 use TungTT\LaravelMap\Http\Controllers\MapController;
 
 Route::get('api/map', [MapController::class, 'index']);
 //Route::post('map/builder/embed', [MapController::class, 'embed']);
-Route::get('api/map/builder/{id?}', [MapController::class, 'builder']);
+//Route::get('api/map/builder/{id?}', [MapController::class, 'builder']);
+
+Route::middleware('api')->group(function (){
+    Route::get('/api/map/builder/{id?}', [MapController::class, 'builder'])->middleware(['auth:sanctum']);
+});
 
 Route::get('/maps/{path?}', function (){
     return File::get('apps/maps/index.html');

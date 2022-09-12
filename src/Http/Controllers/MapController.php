@@ -2,6 +2,7 @@
 
 namespace TungTT\LaravelMap\Http\Controllers;
 
+use App\Facades\GeoNode;
 use App\Http\Controllers\Controller;
 use TungTT\LaravelMap\MenuItemTypes\LayerGroupMenuItemType;
 use TungTT\LaravelMap\MenuItemTypes\LayerMenuItemType;
@@ -13,6 +14,8 @@ use Outl1ne\MenuBuilder\MenuBuilder;
 
 class MapController extends Controller
 {
+    protected array $resources = [];
+
     public function embed(Request $request){
         $baseLayer = MapLayer::find($request->input('baselayerId'));
 
@@ -35,6 +38,7 @@ class MapController extends Controller
 
         $baseLayers = MapLayer::whereIn('id', $baseLayerMenuItems)->get()->map(fn($v) => $this->formatLayerItem($v))->toArray();
 
+        $this->resources = GeoNode::layerResourcesByUser()->pluck('alternate')->toArray();
 
         return [
             'app' => [
@@ -140,6 +144,7 @@ class MapController extends Controller
 
 
     public function formatLayerItem($layer){
+        $access_token = data_get(auth()->user(), 'geonode_token_info.access_token');
         $service = $layer->service;
         $url = $layer->service ? $service->base_url : $layer->url;
 
@@ -158,6 +163,15 @@ class MapController extends Controller
         if($layer->opacity) $data['ComponentProps']['opacity'] = floatval($layer->opacity);
         if($url) $data['ComponentProps']['url'] = $url;
         if($layer->popup) $data['popup'] = $this->formatPopup($layer->popup);
+
+        if(in_array($data['type'], ['wms', 'wmts'])){
+            if($access_token) $data['ComponentProps']['params']['access_token'] = $access_token;
+            $layers = data_get($layer, 'layer_params.params.layers');
+            if(!in_array($layers, $this->resources)) {
+                $data['locked'] = true;
+//                if($data['selected'])
+            }
+        }
 
         return $data;
     }

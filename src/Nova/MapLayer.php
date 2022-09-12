@@ -2,9 +2,11 @@
 
 namespace TungTT\LaravelMap\Nova;
 
+use App\Facades\GeoNode;
 use App\Nova\Resource;
 use Ganyicz\NovaCallbacks\HasCallbacks;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\FormData;
 use Laravel\Nova\Fields\ID;
@@ -89,8 +91,9 @@ class MapLayer extends Resource
             Select::make(__('Type'), 'layer_params->type')->options(['wms' => 'WMS', 'wmts' => 'WMTS']),
 
             Select::make(__('Resource'), 'layer_params->params->layers')->options(function () {
-                return \TungTT\LaravelMap\Models\GeoNode\Layer::pluck('title_en', 'typename');
+                return GeoNode::layerResourcesByUser()->pluck('title', 'alternate');
             })
+                ->hideFromIndex()
                 ->hide()
                 ->searchable()
                 ->dependsOn(['service_id'], function (Select $field, NovaRequest $request, FormData $formData) {
