@@ -23,6 +23,9 @@ class MapBookmarkRepository extends Repository
             field('icon'),
             field('bounds'),
             field('geometry')->required(),
+            field('user_id')->storeCallback(function () {
+                return optional(auth()->user())->id;
+            }),
         ];
     }
 
