@@ -4,6 +4,8 @@ namespace TungTT\LaravelMap\Restify;
 
 use App\Restify\Repository;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use TungTT\LaravelMap\Models\MapBookmark;
 
 class MapBookmarkRepository extends Repository
@@ -24,5 +26,8 @@ class MapBookmarkRepository extends Repository
         ];
     }
 
-
+    public static function indexQuery(RestifyRequest $request, Relation|Builder $query)
+    {
+        return parent::indexQuery($request, $query)->where('user_id', optional(auth()->user())->id);
+    }
 }
