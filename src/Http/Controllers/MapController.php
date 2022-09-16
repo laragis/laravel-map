@@ -150,7 +150,8 @@ class MapController extends Controller
 
 
     public function formatLayerItem($layer){
-        $access_token = data_get(auth()->user(), 'geonode_token_info.access_token');
+        $access_token = getGeoNodeToken();
+
         $service = $layer->service;
         $url = $layer->service ? $service->base_url : $layer->url;
 
