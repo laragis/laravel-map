@@ -38,12 +38,12 @@ class MapApiObserver
             '--all' => true,
         ]);
 
-        if($model->scout){
-            $modelClass = Str::replace('\\', '\\\\', $model->model_type);
-            Artisan::call('scout:import '.$modelClass);
-        } else {
-            $this->deleteIndexByeAlias($model->name);
-        }
+//        if($model->scout){
+//            $modelClass = Str::replace('\\', '\\\\', $model->model_type);
+//            Artisan::call('scout:import '.$modelClass);
+//        } else {
+//            $this->deleteIndexByeAlias($model->name);
+//        }
 
     }
 
