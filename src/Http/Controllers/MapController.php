@@ -175,7 +175,7 @@ class MapController extends Controller
             if($access_token) $data['ComponentProps']['params']['access_token'] = $access_token;
             $layers = data_get($layer, 'layer_params.params.layers');
             if(!in_array($layers, $this->resources)) {
-                $data['locked'] = true;
+//                $data['locked'] = true;
             }
         }
 
