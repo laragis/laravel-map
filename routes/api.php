@@ -18,4 +18,7 @@ Route::get('/api/map/builder/{id?}', [MapController::class, 'builder']);
 
 Route::get('/maps/{path?}', function (){
     return File::get('apps/maps/index.html');
-})->where('path', '[a-zA-Z0-9-/]+');
+})
+//    ->where('path', '[a-zA-Z0-9-/\:]+')
+    ->where('path', '.+')
+;
