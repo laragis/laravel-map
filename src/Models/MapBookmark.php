@@ -10,8 +10,21 @@ class MapBookmark extends Model
 
     protected $table = 'maps_bookmarks';
 
+    protected $fillable = [
+        'title',
+        'description',
+        'geometry',
+    ];
+
     protected $casts = [
         'bounds' => 'array',
         'geometry' => 'array',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            $model->user_id = auth()->user()->id;
+        });
+    }
 }
