@@ -6,12 +6,14 @@ use App\Restify\Repository;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Arr;
 use Maatwebsite\Excel\Facades\Excel;
 use TungTT\LaravelMap\Exports\MapBookmarkExport;
 use TungTT\LaravelMap\Imports\MapBookmarkImport;
 use TungTT\LaravelMap\Models\MapBookmark;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use File;
 
 class MapBookmarkRepository extends Repository
 {
@@ -46,7 +48,20 @@ class MapBookmarkRepository extends Repository
 
     public function export()
     {
-        return (new MapBookmarkExport)->download(static::$uriKey.'.xls', \Maatwebsite\Excel\Excel::XLS);
+        $data = [
+            'type' => 'FeatureCollection',
+            'features' => static::$model::where('user_id', auth()->user()?->id)->get()->map(fn($model) => [
+                'type' => 'Feature',
+                'geometry' => $model->geometry,
+                'properties' => Arr::only($model->toArray(), ['title', 'description', 'created_at', 'updated_at'])
+            ])->all()
+        ];
+
+        $fileName = time() . '_bookmarks.geojson';
+        $fileStorePath = public_path('/download/map_bookmarks/'.$fileName);
+        File::put($fileStorePath, json_encode($data));
+
+        return response()->download($fileStorePath);
     }
 
     public function import(Request $request){
