@@ -17,7 +17,7 @@ class MapBookmarkImport implements ToModel, WithValidation, WithHeadingRow
             'geometry' => [
                 'type' => 'Point',
                 'coordinates' => [$row['lng'], $row['lat']]
-            ]
+            ],
         ]);
     }
 

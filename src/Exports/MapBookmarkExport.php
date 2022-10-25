@@ -15,7 +15,7 @@ class MapBookmarkExport extends DefaultValueBinder implements FromCollection, Wi
 
     public function collection()
     {
-        return MapBookmark::all()->map(fn($model) => [
+        return MapBookmark::where('user_id', auth()->user()?->id)->get()->map(fn($model) => [
             'id' => $model->id,
             'title' => $model->title,
             'description' => $model->description,
