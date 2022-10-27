@@ -4,16 +4,15 @@ namespace TungTT\LaravelMap\Restify;
 
 use App\Restify\Repository;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use File;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
 use Maatwebsite\Excel\Facades\Excel;
-use TungTT\LaravelMap\Exports\MapBookmarkExport;
 use TungTT\LaravelMap\Imports\MapBookmarkImport;
 use TungTT\LaravelMap\Models\MapBookmark;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use File;
 
 class MapBookmarkRepository extends Repository
 {
@@ -21,7 +20,16 @@ class MapBookmarkRepository extends Repository
 
     public static string $uriKey = 'map_bookmark';
 
+    public static string $title = 'title';
+
+    public static array $search = ['title'];
+
     public static array $sort = ['id', 'title'];
+
+    public static array $match = [
+        'title' => 'string',
+        'description' => 'string',
+    ];
 
     public function fields(RestifyRequest $request): array
     {
@@ -65,7 +73,24 @@ class MapBookmarkRepository extends Repository
     }
 
     public function import(Request $request){
-        Excel::import(new MapBookmarkImport, $request->file('file'));
-        return [];
+
+        $request->validate([
+            'file' => 'required|mimes:json',
+        ]);
+
+        $features = data_get(json_decode($request->file('file')->getContent(), true), 'features', []);
+
+        collect($features)->each(function ($feature){
+            $model = new MapBookmark();
+            $model->fill([
+                'title' => data_get($feature, 'properties.title'),
+                'description' => data_get($feature, 'properties.description'),
+                'geometry' => $feature['geometry']
+            ])->save();
+        });
+
+        return [
+            'status' => 'OK'
+        ];
     }
 }
