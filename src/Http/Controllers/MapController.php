@@ -77,6 +77,12 @@ class MapController extends Controller
         return MapMap::all();
     }
 
+    public function view(Request $request){
+        $resourcebase_ptr_id = $request->get('resourcebase_ptr_id');
+        $model = \App\Models\MapMap::where('resourcebase_ptr_id', $resourcebase_ptr_id)->firstOrFail();
+        return redirect("/maps/{$model->id}/layers");
+    }
+
 //    protected function toLayerType($type)
 //    {
 //        return strtolower($type);
