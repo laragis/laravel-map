@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MapShare;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use TungTT\LaravelMap\Exceptions\PageExpiredException;
 
 class ShareController extends Controller
 {
@@ -29,8 +30,13 @@ class ShareController extends Controller
         ];
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function show($token){
-        $model = MapShare::where('token', $token)->firstOrFail();
+        $model = MapShare::latest()->where('token', $token)->orWhere('expires_at', '>=', Carbon::now())->first();
+
+        throw_unless($model, new PageExpiredException( 'Link chia sẽ đã hết hạn'));
 
         return redirect($model->url);
     }
