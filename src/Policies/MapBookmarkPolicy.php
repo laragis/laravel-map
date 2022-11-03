@@ -19,33 +19,33 @@ class MapBookmarkPolicy
         return true;
     }
 
-    public function store(User $user = null): bool
+    public function store(User $user): bool
     {
         return true;
     }
 
     public function storeBulk(User $user): bool
     {
-        return true;
+        return false;
     }
 
-    public function update(User $user = null, MapBookmark $model): bool
+    public function update(User $user, MapBookmark $model): bool
     {
-        return true;
+        return $model->user_id === $user->id;
     }
 
     public function updateBulk(User $user, MapBookmark $model): bool
     {
-        return true;
+        return false;
     }
 
     public function deleteBulk(User $user, MapBookmark $model): bool
     {
-        return true;
+        return false;
     }
 
     public function delete(User $user, MapBookmark $model): bool
     {
-        return true;
+        return $model->user_id === $user->id;
     }
 }

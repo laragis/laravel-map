@@ -5,6 +5,7 @@ namespace TungTT\LaravelMap\Restify;
 use App\Restify\Repository;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use File;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
@@ -50,12 +51,14 @@ class MapBookmarkRepository extends Repository
 
     public static function routes(Router $router, $attributes = [], $wrap = true)
     {
-        $router->get('export', [static::class, 'export']);
-        $router->post('import', [static::class, 'import']);
+        $router->get('export', [static::class, 'export'])->middleware('auth.session');
+        $router->post('import', [static::class, 'import'])->middleware('auth.session');
     }
 
     public function export()
     {
+        if(!auth()->check()) abort(403);
+
         $data = [
             'type' => 'FeatureCollection',
             'features' => static::$model::where('user_id', auth()->user()?->id)->get()->map(fn($model) => [
@@ -73,6 +76,7 @@ class MapBookmarkRepository extends Repository
     }
 
     public function import(Request $request){
+        if(!auth()->check()) abort(403);
 
         $request->validate([
             'file' => 'required|mimes:json',
