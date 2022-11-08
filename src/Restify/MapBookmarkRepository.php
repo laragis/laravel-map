@@ -55,13 +55,19 @@ class MapBookmarkRepository extends Repository
         $router->post('import', [static::class, 'import'])->middleware('auth.session');
     }
 
-    public function export()
+    public function export(Request $request)
     {
         if(!auth()->check()) abort(403);
 
+        $ids = explode(',', $request->input('ids'));
+
+        $models = static::$model::where('user_id', auth()->user()?->id);
+
+        if(!empty($ids)) $models = $models->whereIn('id', $ids);
+
         $data = [
             'type' => 'FeatureCollection',
-            'features' => static::$model::where('user_id', auth()->user()?->id)->get()->map(fn($model) => [
+            'features' => $models->get()->map(fn($model) => [
                 'type' => 'Feature',
                 'geometry' => $model->geometry,
                 'properties' => Arr::only($model->toArray(), ['title', 'description', 'created_at', 'updated_at'])
