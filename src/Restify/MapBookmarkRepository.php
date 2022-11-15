@@ -59,7 +59,7 @@ class MapBookmarkRepository extends Repository
     {
         if(!auth()->check()) abort(403);
 
-        $ids = $request->has('id') ? explode(',', $request->input('ids')) : [];
+        $ids = $request->has('ids') ? explode(',', $request->input('ids')) : [];
 
         $models = static::$model::where('user_id', auth()->user()?->id);
 
