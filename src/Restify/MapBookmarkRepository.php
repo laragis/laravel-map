@@ -40,7 +40,11 @@ class MapBookmarkRepository extends Repository
             field('description'),
             field('icon'),
             field('bounds'),
+            field('radius'),
             field('geometry')->required(),
+            field('created_at'),
+            field('user_id'),
+            field('images', fn() => $this->getModelImages($this)),
         ];
     }
 
@@ -53,6 +57,57 @@ class MapBookmarkRepository extends Repository
     {
         $router->get('export', [static::class, 'export'])->middleware('auth.session');
         $router->post('import', [static::class, 'import'])->middleware('auth.session');
+        $router->get('{id}/images', [static::class, 'getImages'])->middleware('auth.session');
+        $router->post('{id}/images/upload', [static::class, 'uploadImages'])->middleware('auth.session');
+        $router->delete('{id}/images', [static::class, 'deleteImages'])->middleware('auth.session');
+    }
+
+    public function getImages($id){
+        $bookmark = static::$model::findOrFail($id);
+
+        return [
+            'data' => $this->getModelImages($bookmark)
+        ];
+    }
+
+    public function uploadImages(Request $request, $id){
+        $bookmark = static::$model::findOrFail($id);
+
+        if ($request->hasFile('file')) {
+            $bookmark->addMultipleMediaFromRequest(['file'])->each(function ($fileAdder) {
+                $fileAdder->toMediaCollection('bookmark');
+            });
+        }
+
+        return [
+            'data' => $bookmark
+        ];
+    }
+
+    public function deleteImages($id){
+        $bookmark = static::$model::findOrFail($id);
+        $bookmark->clearMediaCollection('bookmark');
+
+        return [
+            'data' => $this->getModelImages($bookmark)
+        ];
+    }
+
+    protected function getModelImages($model){
+        return $model->getMedia('bookmark')->map(fn($item) => $this->toMediaResource($item));
+    }
+
+    protected function toMediaResource($model){
+        return [
+            'id' => $model->id,
+            'uuid' => $model->uuid,
+            'name' => $model->name,
+            'file_name' => $model->file_name,
+            'file_url' => $model->getUrl(),
+            'file_size' => $model->size,
+            'created_at' => $model->created_at,
+            'updated_at' => $model->updated_at,
+        ];
     }
 
     public function export(Request $request)
@@ -70,7 +125,7 @@ class MapBookmarkRepository extends Repository
             'features' => $models->get()->map(fn($model) => [
                 'type' => 'Feature',
                 'geometry' => $model->geometry,
-                'properties' => Arr::only($model->toArray(), ['title', 'description', 'created_at', 'updated_at'])
+                'properties' => Arr::only($model->toArray(), ['title', 'description', 'radius', 'created_at', 'updated_at'])
             ])->all()
         ];
 
