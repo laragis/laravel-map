@@ -44,7 +44,7 @@ class MapBookmarkRepository extends Repository
             field('geometry')->required(),
             field('created_at'),
             field('user_id'),
-            field('images', fn() => $this->getModelImages($this)),
+            field('images', fn() => $this->getModelImages($this))->readonly(),
         ];
     }
 
